@@ -1,7 +1,6 @@
 import java.util.NoSuchElementException;
 
-public class ArrayDeque<T> implements Dequeue<T>
-{
+public class ArrayDeque<T> {
     private static final int DEFAULT_SIZE = 8;
     private static final int RESIZE_FACTOR = 2;
     private static final int USAGE_FACTOR = 4;

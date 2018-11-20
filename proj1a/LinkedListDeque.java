@@ -1,7 +1,6 @@
 import java.util.NoSuchElementException;
 
-public class LinkedListDeque<T> implements Dequeue<T>
-{
+public class LinkedListDeque<T> {
     private int size;
     private Node<T> sentinel;
 

@@ -1,5 +1,4 @@
-public interface Dequeue <T>
-{
+public interface Dequeue <T> {
     void addFirst(T item);
     void addLast(T item);
     boolean isEmpty();
