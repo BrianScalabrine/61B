@@ -1,4 +1,4 @@
-import java.util.NoSuchElementException;
+//import java.util.NoSuchElementException;
 
 public class LinkedListDeque<T> {
     private int size;
@@ -73,7 +73,8 @@ public class LinkedListDeque<T> {
 
     public T removeFirst() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            //throw new NoSuchElementException();
+            return null;
         }
 
         size--;
@@ -88,7 +89,8 @@ public class LinkedListDeque<T> {
 
     public T removeLast() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            //throw new NoSuchElementException();
+            return null;
         }
 
         size--;
@@ -102,7 +104,10 @@ public class LinkedListDeque<T> {
     }
 
     public T get(int index) {
-        checkIndexOutOfBounds(index);
+        //checkIndexOutOfBounds(index);
+        if (index >= size || index < 0) {
+            return null;
+        }
 
         if (index == size - 1) {
             // Get last item
@@ -118,7 +123,10 @@ public class LinkedListDeque<T> {
     }
 
     public T getRecursive(int index) {
-        checkIndexOutOfBounds(index);
+        //checkIndexOutOfBounds(index);
+        if (index >= size || index < 0) {
+            return null;
+        }
 
         if (index == size - 1) {
             // Get last item
@@ -130,7 +138,8 @@ public class LinkedListDeque<T> {
 
     private void checkIndexOutOfBounds(int index) {
         if (index >= size || index < 0) {
-            throw new IndexOutOfBoundsException();
+            //throw new IndexOutOfBoundsException();
+            return;
         }
     }
 

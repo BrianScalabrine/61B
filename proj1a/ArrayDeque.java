@@ -1,4 +1,4 @@
-import java.util.NoSuchElementException;
+//import java.util.NoSuchElementException;
 
 public class ArrayDeque<T> {
     private static final int DEFAULT_SIZE = 8;
@@ -57,7 +57,8 @@ public class ArrayDeque<T> {
 
     public T removeFirst() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            //throw new NoSuchElementException();
+            return null;
         }
 
         ensureUsage();
@@ -72,7 +73,8 @@ public class ArrayDeque<T> {
 
     public T removeLast() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            //throw new NoSuchElementException();
+            return null;
         }
 
         ensureUsage();
@@ -87,7 +89,8 @@ public class ArrayDeque<T> {
 
     public T get(int index) {
         if (index >= size || index < 0) {
-            throw new IndexOutOfBoundsException();
+            //throw new IndexOutOfBoundsException();
+            return null;
         }
 
         index = addOne(nextFirst + index);
@@ -126,7 +129,8 @@ public class ArrayDeque<T> {
 
     private void moveItems(int newSize) {
         if (newSize <= size) {
-            throw new IllegalStateException();
+            //throw new IllegalStateException();
+            return;
         }
 
         T newItems[] = (T[]) new Object[newSize];
