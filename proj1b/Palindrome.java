@@ -21,8 +21,7 @@ public class Palindrome {
     private boolean isPalindromeRecursive(Deque<Character> wordDeque) {
         if (wordDeque.isEmpty() || wordDeque.size() == 1) {
             return true;
-        }
-        else if (wordDeque.removeFirst() != wordDeque.removeLast()) {
+        } else if (wordDeque.removeFirst() != wordDeque.removeLast()) {
             return false;
         }
 
@@ -32,8 +31,7 @@ public class Palindrome {
     private boolean isPalindromeRecursive(Deque<Character> wordDeque, CharacterComparator cc) {
         if (wordDeque.isEmpty() || wordDeque.size() == 1) {
             return true;
-        }
-        else if (!cc.equalChars(wordDeque.removeFirst(), wordDeque.removeLast())) {
+        } else if (!cc.equalChars(wordDeque.removeFirst(), wordDeque.removeLast())) {
             return false;
         }
 
