@@ -31,7 +31,7 @@ public class Palindrome {
     private boolean isPalindromeRecursive(Deque<Character> wordDeque, CharacterComparator cc) {
         if (wordDeque.isEmpty() || wordDeque.size() == 1) {
             return true;
-        } else if (!cc.equalChars(wordDeque.removeFirst(), wordDeque.removeLast())) {
+        } else if (!cc.equalChars(Character.toUpperCase(wordDeque.removeFirst()), Character.toUpperCase(wordDeque.removeLast()))) {
             return false;
         }
 
