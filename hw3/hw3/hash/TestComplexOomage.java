@@ -35,10 +35,14 @@ public class TestComplexOomage {
     }
 
     private ComplexOomage deadlyComplexOomage() {
-        int N = 10;
+        int N = 5;
         ArrayList<Integer> params = new ArrayList<>(N);
         for (int i = 0; i < N; i += 1) {
-            params.add(StdRandom.uniform(0, 127) * 2);
+            if (i < 4) {
+                params.add(StdRandom.uniform(0, 255));
+            } else {
+                params.add(0);
+            }
         }
         return new ComplexOomage(params);
     }
