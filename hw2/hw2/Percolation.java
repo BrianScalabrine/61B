@@ -42,11 +42,9 @@ public class Percolation {
 
     public void open(int row, int col) {
         if (isOpen(row, col)) {
-            return;
+            sites[row][col] = true;
+            numberOfOpenSites++;
         }
-
-        sites[row][col] = true;
-        numberOfOpenSites++;
 
         if (row > 0) {
             connectSites(row, col, row - 1, col);
