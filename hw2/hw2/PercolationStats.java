@@ -8,7 +8,6 @@ public class PercolationStats {
     private double stddev;
     private double confidenceLow;
     private double confidenceHigh;
-
     private final double Z_VALUE = 1.96;
 
     public PercolationStats(int N, int T, PercolationFactory pf) {
@@ -26,7 +25,7 @@ public class PercolationStats {
 
                 while (p.isOpen(row, col)) {
                     row = StdRandom.uniform(N);
-                    col = StdRandom.uniform(N);;
+                    col = StdRandom.uniform(N);
                 }
 
                 p.open(row, col);

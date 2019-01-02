@@ -1,6 +1,6 @@
 package hw2;
 
-import edu.princeton.cs.algs4.QuickFindUF;
+//import edu.princeton.cs.algs4.QuickFindUF;
 import edu.princeton.cs.algs4.Stopwatch;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
@@ -41,7 +41,10 @@ public class Percolation {
     }
 
     public void open(int row, int col) {
-        checkIndices(row, col);
+        if (isOpen(row, col)) {
+            return;
+        }
+
         sites[row][col] = true;
         numberOfOpenSites++;
 
