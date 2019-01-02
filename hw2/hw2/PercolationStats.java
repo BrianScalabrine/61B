@@ -31,7 +31,7 @@ public class PercolationStats {
                 p.open(row, col);
             }
 
-            thresholdEstimates[t] = p.numberOfOpenSites() / N;
+            thresholdEstimates[t] = p.numberOfOpenSites() / (double)(N * N);
         }
 
         mean = StdStats.mean(thresholdEstimates);

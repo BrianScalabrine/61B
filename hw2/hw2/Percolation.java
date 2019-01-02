@@ -25,7 +25,7 @@ public class Percolation {
         sites = new boolean[N][N];
 
         // Virtual sites
-        virtualTopSite = (N > 1) ? numberOfSites : numberOfSites + 1;
+        virtualTopSite = numberOfSites;
         virtualBottomSite = virtualTopSite + 1;
 
         // Add two virtual sites
