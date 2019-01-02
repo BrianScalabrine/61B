@@ -35,8 +35,10 @@ public class Percolation {
         for (int col = 0; col < sites.length; ++col) {
             disjointSet.union(col, virtualTopSite);
 
-            int bottomCol = rowColTo1D(sites.length - 1, col);
-            disjointSet.union(bottomCol, virtualBottomSite);
+            if (sites.length > 1) {
+                int bottomCol = rowColTo1D(sites.length - 1, col);
+                disjointSet.union(bottomCol, virtualBottomSite);
+            }
         }
     }
 

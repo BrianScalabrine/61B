@@ -15,7 +15,9 @@ public class PercolationStats {
             throw new IllegalArgumentException("N and T cannot be less than or equal to 0");
         }
 
+        double numberOfSites = N * N;
         double[] thresholdEstimates = new double[T];
+
         for (int t = 0; t < T; ++t) {
             Percolation p = pf.make(N);
 
@@ -31,7 +33,7 @@ public class PercolationStats {
                 p.open(row, col);
             }
 
-            thresholdEstimates[t] = p.numberOfOpenSites() / (double)(N * N);
+            thresholdEstimates[t] = p.numberOfOpenSites() / numberOfSites;
         }
 
         mean = StdStats.mean(thresholdEstimates);
