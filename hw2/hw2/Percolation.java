@@ -25,8 +25,8 @@ public class Percolation {
         sites = new boolean[N][N];
 
         // Virtual sites
-        virtualTopSite = numberOfSites;
-        virtualBottomSite = numberOfSites + 1;
+        virtualTopSite = (N > 1) ? numberOfSites : numberOfSites + 1;
+        virtualBottomSite = virtualTopSite + 1;
 
         // Add two virtual sites
         disjointSet = new WeightedQuickUnionUF(numberOfSites + 2);
@@ -41,10 +41,12 @@ public class Percolation {
     }
 
     public void open(int row, int col) {
-        if (!isOpen(row, col)) {
-            sites[row][col] = true;
-            numberOfOpenSites++;
+        if (isOpen(row, col)) {
+            return;
         }
+
+        sites[row][col] = true;
+        numberOfOpenSites++;
 
         if (row > 0) {
             connectSites(row, col, row - 1, col);
@@ -72,10 +74,10 @@ public class Percolation {
         if (isOpen(row, col)) {
             int p = rowColTo1D(row, col);
 
-            int count = disjointSet.count();
-            int findP = disjointSet.find(p);
-            int findBot = disjointSet.find(virtualBottomSite);
-            int findTop = disjointSet.find(virtualTopSite);
+//            int count = disjointSet.count();
+//            int findP = disjointSet.find(p);
+//            int findBot = disjointSet.find(virtualBottomSite);
+//            int findTop = disjointSet.find(virtualTopSite);
 
             return disjointSet.connected(p, virtualTopSite);
         }
