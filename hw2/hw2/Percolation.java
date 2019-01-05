@@ -32,14 +32,13 @@ public class Percolation {
         disjointSet = new WeightedQuickUnionUF(numberOfSites + 2);
         //disjointSet = new QuickFindUF(numberOfSites + 2);
 
-        if (sites.length > 1) {
-            for (int col = 0; col < sites.length; ++col) {
-                disjointSet.union(col, virtualTopSite);
+        for (int col = 0; col < sites.length; ++col) {
+            disjointSet.union(col, virtualTopSite);
+
+            if (sites.length > 1) {
                 int bottomCol = rowColTo1D(sites.length - 1, col);
                 disjointSet.union(bottomCol, virtualBottomSite);
             }
-        } else {
-            disjointSet.union(0, virtualBottomSite);
         }
     }
 
@@ -93,6 +92,10 @@ public class Percolation {
     }
 
     public boolean percolates() {
+        if (sites.length == 1) {
+            return isOpen(0, 0);
+        }
+
         return disjointSet.connected(virtualTopSite, virtualBottomSite);
     }
 
