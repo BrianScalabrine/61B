@@ -204,11 +204,8 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
             if (contents[i].item().equals(item)) {
                 contents[i] = new Node(item, priority);
 
-                if (min(i, parentIndex(i)) == i) {
-                    swim(i);
-                } else if (inBounds(leftIndex(i))){
-                    sink(i);
-                }
+                swim(i);
+                sink(i);
 
                 break;
             }
