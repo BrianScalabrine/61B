@@ -6,10 +6,10 @@ import java.util.Comparator;
 
 public class Solver {
     private class SearchNode {
-        public WorldState state;
-        public SearchNode previous;
-        public int movesMade;
-        public int heuristic;
+        private WorldState state;
+        private SearchNode previous;
+        private int movesMade;
+        private int heuristic;
 
         public SearchNode(WorldState state, SearchNode previous, int movesMade) {
             this.state = state;
@@ -33,7 +33,7 @@ public class Solver {
             new MinPQ<>(Comparator.comparingInt(SearchNode::priority));
 
         // Start node
-        fringe.insert(new SearchNode(initial,null, 0));
+        fringe.insert(new SearchNode(initial, null, 0));
 
         while (!fringe.isEmpty()) {
             SearchNode node = fringe.delMin();
@@ -52,7 +52,7 @@ public class Solver {
             for (WorldState neighbor : node.state.neighbors()) {
                 // Add neighbors to fringe, after checking not equal to grandparent
                 if (node.previous == null || !neighbor.equals(node.previous.state)) {
-                    fringe.insert(new SearchNode(neighbor, node,node.movesMade + 1));
+                    fringe.insert(new SearchNode(neighbor, node, node.movesMade + 1));
                 }
             }
         }

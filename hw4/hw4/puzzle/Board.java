@@ -2,7 +2,9 @@ package hw4.puzzle;
 
 import edu.princeton.cs.algs4.Queue;
 
-public class Board implements WorldState{
+import java.util.Arrays;
+
+public class Board implements WorldState {
     private int[][] tiles;
     private static final int BLANK = 0;
 
@@ -140,13 +142,18 @@ public class Board implements WorldState{
     }
 
     @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(tiles);
+    }
+
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
         int N = size();
         s.append(N + "\n");
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                s.append(String.format("%2d ", tileAt(i,j)));
+                s.append(String.format("%2d ", tileAt(i, j)));
             }
             s.append("\n");
         }
