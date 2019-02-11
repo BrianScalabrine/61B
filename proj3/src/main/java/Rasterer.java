@@ -144,6 +144,5 @@ public class Rasterer {
 
     private String getFileName(int depth, int x, int y) {
         return "d" + depth + "_x" + x + "_y" + y + ".png";
-        //return String.format("d%d_x%d_y%d.png", depth, x, y);
     }
 }

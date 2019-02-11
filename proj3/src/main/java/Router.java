@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +59,8 @@ public class Router {
         Map<Long, Double> best = new HashMap<>();
         best.put(s, 0.0);
 
+        Set<Long> marked = new HashSet<>();
+
         Queue<SearchNode> fringe = new PriorityQueue<>(
             Comparator.comparingDouble(SearchNode::priority));
 
@@ -64,6 +68,11 @@ public class Router {
 
         while (!fringe.isEmpty()) {
             SearchNode node = fringe.poll();
+
+            if (marked.contains(node.v)) {
+                continue;
+            }
+
             if (node.v == t) {
                 while (node != null) {
                     shortestPath.addFirst(node.v);
@@ -71,6 +80,8 @@ public class Router {
                 }
                 break;
             }
+
+            marked.add(node.v);
 
             // Best known d (distance) from s (start) to v
             Double dsv = best.get(node.v);
