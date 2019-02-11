@@ -1,9 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO: remove
-import java.util.Arrays;
-
 /**
  * This class provides all code necessary to take a query box and produce
  * a query result. The getMapRaster method must return a Map containing all
@@ -25,7 +22,7 @@ public class Rasterer {
     }
 
     public Rasterer() {
-        // TODO: do I need to initialize anything here???
+
     }
 
     /**
@@ -103,44 +100,42 @@ public class Rasterer {
         int cols = xEnd - xStart + 1;
         int rows = yEnd - yStart + 1;
 
-        String[][] render_grid = new String[rows][cols];
+        String[][] renderGrid = new String[rows][cols];
 
         for (int row = 0, y = yStart; row < rows; ++row, ++y) {
             for (int col = 0, x = xStart; col < cols; ++col, ++x) {
-                render_grid[row][col] = getFileName(depth, x, y);
+                renderGrid[row][col] = getFileName(depth, x, y);
             }
         }
 
-        double raster_ul_lon = MapServer.ROOT_ULLON + (xStart * londpt);
-        double raster_ul_lat = MapServer.ROOT_ULLAT - (yStart * latdpt);
-        double raster_lr_lon = MapServer.ROOT_ULLON + ((xEnd + 1) * londpt);
-        double raster_lr_lat = MapServer.ROOT_ULLAT - ((yEnd + 1) * latdpt);
+        double rullon = MapServer.ROOT_ULLON + (xStart * londpt);
+        double rullat = MapServer.ROOT_ULLAT - (yStart * latdpt);
+        double rlrlon = MapServer.ROOT_ULLON + ((xEnd + 1) * londpt);
+        double rlrlat = MapServer.ROOT_ULLAT - ((yEnd + 1) * latdpt);
 
-        results.put("render_grid", render_grid);
-        results.put("raster_ul_lon", raster_ul_lon);
-        results.put("raster_ul_lat", raster_ul_lat);
-        results.put("raster_lr_lon", raster_lr_lon);
-        results.put("raster_lr_lat", raster_lr_lat);
+        results.put("render_grid", renderGrid);
+        results.put("raster_ul_lon", rullon);
+        results.put("raster_ul_lat", rullat);
+        results.put("raster_lr_lon", rlrlon);
+        results.put("raster_lr_lat", rlrlat);
         results.put("depth", depth);
         results.put("query_success", true);
 
-        //System.out.println(results);
-        //System.out.println(Arrays.deepToString(render_grid));
         return results;
     }
 
     private boolean queryBoxIsValid(double ullon, double ullat, double lrlon, double lrlat) {
-        return (ullon < MapServer.ROOT_LRLON &&
-                ullat > MapServer.ROOT_LRLAT &&
-                lrlon > MapServer.ROOT_ULLON &&
-                lrlat < MapServer.ROOT_ULLAT &&
-                ullon < lrlon && lrlat < ullat);
+        return (ullon < MapServer.ROOT_LRLON
+                && ullat > MapServer.ROOT_LRLAT
+                && lrlon > MapServer.ROOT_ULLON
+                && lrlat < MapServer.ROOT_ULLAT
+                && ullon < lrlon && lrlat < ullat);
     }
 
     private int getDepth(double queryLonDpp) {
         for (int depth = 0; depth <= MAX_FILE_DEPTH; ++depth) {
             if (DEPTH_LON_DPP[depth] <= queryLonDpp) {
-               return depth;
+                return depth;
             }
         }
 

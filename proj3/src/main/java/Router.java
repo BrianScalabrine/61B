@@ -1,4 +1,13 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,7 +57,8 @@ public class Router {
         Map<Long, Double> best = new HashMap<>();
         best.put(s, 0.0);
 
-        Queue<SearchNode> fringe = new PriorityQueue<>(Comparator.comparingDouble(SearchNode::priority));
+        Queue<SearchNode> fringe = new PriorityQueue<>(
+            Comparator.comparingDouble(SearchNode::priority));
         fringe.add(new SearchNode(s, g.distance(s, t)));
 
         while (!fringe.isEmpty()) {
@@ -82,7 +92,7 @@ public class Router {
                         double h = g.distance(w, t);
 
                         // Add w to the fringe with priority of best known distance + heuristic
-                        fringe.add(new SearchNode(w,dsv + edvw + h));
+                        fringe.add(new SearchNode(w, dsv + edvw + h));
                     }
                 }
             }
@@ -115,14 +125,14 @@ public class Router {
             if (-15 <= bearing && bearing <= 15) {
                 nd.direction = NavigationDirection.STRAIGHT;
             } else if (-30 <= bearing && bearing <= 30) {
-                nd.direction = (bearing < 0) ?
-                    NavigationDirection.SLIGHT_LEFT : NavigationDirection.SLIGHT_RIGHT;
+                nd.direction = (bearing < 0)
+                    ? NavigationDirection.SLIGHT_LEFT : NavigationDirection.SLIGHT_RIGHT;
             } else if (-100 <= bearing && bearing <= 100) {
-                nd.direction = (bearing < 0) ?
-                    NavigationDirection.LEFT : NavigationDirection.RIGHT;
+                nd.direction = (bearing < 0)
+                    ? NavigationDirection.LEFT : NavigationDirection.RIGHT;
             } else {
-                nd.direction = (bearing < 0) ?
-                    NavigationDirection.SHARP_LEFT : NavigationDirection.SHARP_RIGHT;
+                nd.direction = (bearing < 0)
+                    ? NavigationDirection.SHARP_LEFT : NavigationDirection.SHARP_RIGHT;
             }
 
             previous = current;

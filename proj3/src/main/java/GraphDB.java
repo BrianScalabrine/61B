@@ -6,7 +6,11 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.*;
+
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -21,25 +25,25 @@ public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
     static class Node {
-        long id;
+        long v;
         double lat;
         double lon;
         String name;
         private Set<Long> edges;
 
-        Node(long id, double lat, double lon) {
-            this.id = id;
-            this.lat = lat;
-            this.lon = lon;
+        Node() {
+            this.v = 0;
+            this.lat = 0;
+            this.lon = 0;
             this.name = "";
             this.edges = new HashSet<>();
         }
 
-        void addEdge(long id) {
-            edges.add(id);
+        void addEdge(long w) {
+            edges.add(w);
         }
-        void removeEdge(long id) {
-            edges.remove(id);
+        void removeEdge(long w) {
+            edges.remove(w);
         }
         boolean hasEdges() {
             return !edges.isEmpty();
@@ -180,18 +184,18 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
-        long closestId = 0;
+        long closest = 0;
         double closestDistance = Integer.MAX_VALUE;
 
         for (Node node : graph.values()) {
             double distance = distance(lon, lat, node.lon, node.lat);
             if (distance < closestDistance) {
-                closestId = node.id;
+                closest = node.v;
                 closestDistance = distance;
             }
         }
 
-        return closestId;
+        return closest;
     }
 
     /**
@@ -216,7 +220,7 @@ public class GraphDB {
 
     void addNode(Node node) {
         if (node != null) {
-            graph.put(node.id, node);
+            graph.put(node.v, node);
         }
     }
 
@@ -230,13 +234,13 @@ public class GraphDB {
         }
     }
 
-    Node removeNode(long id) {
-        Node node = graph.remove(id);
+    Node removeNode(long v) {
+        Node node = graph.remove(v);
         if (node != null) {
-            for (long connectedId : node.getEdges()) {
-                Node connectedNode = graph.get(connectedId);
+            for (long connected : node.getEdges()) {
+                Node connectedNode = graph.get(connected);
                 if (connectedNode != null) {
-                    connectedNode.removeEdge(id);
+                    connectedNode.removeEdge(v);
                 }
             }
         }

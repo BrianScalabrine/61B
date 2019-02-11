@@ -115,6 +115,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     /* Returns a Set view of the keys contained in this map. */
     @Override
     public Set<K> keySet() {
+
         throw new UnsupportedOperationException();
     }
 
@@ -125,6 +126,8 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     @Override
     public V remove(K key) {
         throw new UnsupportedOperationException();
+
+        // start from root
     }
 
     /** Removes the key-value entry for the specified key only if it is
@@ -134,10 +137,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     @Override
     public V remove(K key, V value) {
         throw new UnsupportedOperationException();
+
+        // start from root
     }
 
     @Override
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        return keySet().iterator();
     }
 }

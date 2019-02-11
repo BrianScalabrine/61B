@@ -77,11 +77,10 @@ public class GraphBuildingHandler extends DefaultHandler {
             /* We encountered a new <node...> tag. */
             activeState = "node";
 
-            long id = Long.parseLong(attributes.getValue("id"));
-            double lat = Double.parseDouble(attributes.getValue("lat"));
-            double lon = Double.parseDouble(attributes.getValue("lon"));
-
-            lastNode = new GraphDB.Node(id, lat, lon);
+            lastNode = new GraphDB.Node();
+            lastNode.v = Long.parseLong(attributes.getValue("id"));
+            lastNode.lat = Double.parseDouble(attributes.getValue("lat"));
+            lastNode.lon = Double.parseDouble(attributes.getValue("lon"));
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
             activeState = "way";
