@@ -1,5 +1,4 @@
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +11,20 @@ import java.util.regex.Pattern;
  * down to the priority you use to order your vertices.
  */
 public class Router {
+    private static class SearchNode {
+        long v;
+        double priority;
+
+        public SearchNode(long v, double priority) {
+            this.v = v;
+            this.priority = priority;
+        }
+
+        public double priority() {
+            return priority;
+        }
+    }
+
     /**
      * Return a List of longs representing the shortest path from the node
      * closest to a start location and the node closest to the destination
@@ -25,7 +38,57 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // FIXME
+        long s = g.closest(stlon, stlat);
+        long t = g.closest(destlon, destlat);
+
+        LinkedList<Long> shortestPath = new LinkedList<>();
+
+        Map<Long, SearchNode> edgeTo = new HashMap<>();
+
+        Map<Long, Double> best = new HashMap<>();
+        best.put(s, 0.0);
+
+        Queue<SearchNode> fringe = new PriorityQueue<>(Comparator.comparingDouble(SearchNode::priority));
+        fringe.add(new SearchNode(s, g.distance(s, t)));
+
+        while (!fringe.isEmpty()) {
+            SearchNode node = fringe.poll();
+            if (node.v == t) {
+                while (node != null) {
+                    shortestPath.addFirst(node.v);
+                    node = edgeTo.get(node.v);
+                }
+                break;
+            }
+
+            // Best known d (distance) from s (start) to v
+            Double dsv = best.get(node.v);
+            if (dsv != null) {
+                for (long w : g.adjacent(node.v)) {
+                    // Best known distance from start to w
+                    Double dsw = best.get(w);
+
+                    // Great circle distance from v to w
+                    double edvw = g.distance(node.v, w);
+
+                    if (dsw == null || dsv + edvw < dsw) {
+                        // Update best distance from start to w
+                        best.put(w, dsv + edvw);
+
+                        // Update edge to
+                        edgeTo.put(w, node);
+
+                        // Great circle distance from w to t (target); heuristic
+                        double h = g.distance(w, t);
+
+                        // Add w to the fringe with priority of best known distance + heuristic
+                        fringe.add(new SearchNode(w,dsv + edvw + h));
+                    }
+                }
+            }
+        }
+
+        return shortestPath;
     }
 
     /**
@@ -37,7 +100,35 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        return null; // FIXME
+        List<NavigationDirection> routeDirections = new ArrayList<>();
+        routeDirections.add(new NavigationDirection());
+
+        Iterator<Long> iterator = route.iterator();
+        long previous = iterator.next();
+
+        while (iterator.hasNext()) {
+            long current = iterator.next();
+            double bearing = g.bearing(previous, current);
+
+            NavigationDirection nd = new NavigationDirection();
+
+            if (-15 <= bearing && bearing <= 15) {
+                nd.direction = NavigationDirection.STRAIGHT;
+            } else if (-30 <= bearing && bearing <= 30) {
+                nd.direction = (bearing < 0) ?
+                    NavigationDirection.SLIGHT_LEFT : NavigationDirection.SLIGHT_RIGHT;
+            } else if (-100 <= bearing && bearing <= 100) {
+                nd.direction = (bearing < 0) ?
+                    NavigationDirection.LEFT : NavigationDirection.RIGHT;
+            } else {
+                nd.direction = (bearing < 0) ?
+                    NavigationDirection.SHARP_LEFT : NavigationDirection.SHARP_RIGHT;
+            }
+
+            previous = current;
+        }
+
+        return routeDirections;
     }
 
 

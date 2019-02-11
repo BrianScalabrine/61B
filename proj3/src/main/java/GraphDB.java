@@ -6,7 +6,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -20,6 +20,50 @@ import java.util.ArrayList;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
+    static class Node {
+        long id;
+        double lat;
+        double lon;
+        String name;
+        private Set<Long> edges;
+
+        Node(long id, double lat, double lon) {
+            this.id = id;
+            this.lat = lat;
+            this.lon = lon;
+            this.name = "";
+            this.edges = new HashSet<>();
+        }
+
+        void addEdge(long id) {
+            edges.add(id);
+        }
+        void removeEdge(long id) {
+            edges.remove(id);
+        }
+        boolean hasEdges() {
+            return !edges.isEmpty();
+        }
+        Set<Long> getEdges() {
+            return edges;
+        }
+    }
+
+//    static class Edge {
+//        long to;
+//        String name;
+//
+//        Edge(long to) {
+//            this.to = to;
+//            this.name = "";
+//        }
+//
+////        public int hashCode() {
+////            return Long.hashCode(to);
+////        }
+//    }
+
+    private final Map<Long, Node> graph = new HashMap<>();
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -57,7 +101,7 @@ public class GraphDB {
      *  we can reasonably assume this since typically roads are connected.
      */
     private void clean() {
-        // TODO: Your code here.
+        graph.values().removeIf(node -> !node.hasEdges());
     }
 
     /**
@@ -65,8 +109,7 @@ public class GraphDB {
      * @return An iterable of id's of all vertices in the graph.
      */
     Iterable<Long> vertices() {
-        //YOUR CODE HERE, this currently returns only an empty list.
-        return new ArrayList<Long>();
+        return graph.keySet();
     }
 
     /**
@@ -75,7 +118,8 @@ public class GraphDB {
      * @return An iterable of the ids of the neighbors of v.
      */
     Iterable<Long> adjacent(long v) {
-        return null;
+        Node node = graph.get(v);
+        return node != null ? node.getEdges() : null;
     }
 
     /**
@@ -136,7 +180,18 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
-        return 0;
+        long closestId = 0;
+        double closestDistance = Integer.MAX_VALUE;
+
+        for (Node node : graph.values()) {
+            double distance = distance(lon, lat, node.lon, node.lat);
+            if (distance < closestDistance) {
+                closestId = node.id;
+                closestDistance = distance;
+            }
+        }
+
+        return closestId;
     }
 
     /**
@@ -145,7 +200,8 @@ public class GraphDB {
      * @return The longitude of the vertex.
      */
     double lon(long v) {
-        return 0;
+        Node node = graph.get(v);
+        return node != null ? node.lon : 0;
     }
 
     /**
@@ -154,6 +210,37 @@ public class GraphDB {
      * @return The latitude of the vertex.
      */
     double lat(long v) {
-        return 0;
+        Node node = graph.get(v);
+        return node != null ? node.lat : 0;
+    }
+
+    void addNode(Node node) {
+        if (node != null) {
+            graph.put(node.id, node);
+        }
+    }
+
+    void addEdge(long from, long to) {
+        Node fromNode = graph.get(from);
+        Node toNode = graph.get(to);
+
+        if (fromNode != null && toNode != null) {
+            fromNode.addEdge(to);
+            toNode.addEdge(from);
+        }
+    }
+
+    Node removeNode(long id) {
+        Node node = graph.remove(id);
+        if (node != null) {
+            for (long connectedId : node.getEdges()) {
+                Node connectedNode = graph.get(connectedId);
+                if (connectedNode != null) {
+                    connectedNode.removeEdge(id);
+                }
+            }
+        }
+
+        return node;
     }
 }

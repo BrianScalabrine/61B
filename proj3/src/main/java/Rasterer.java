@@ -1,6 +1,9 @@
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO: remove
+import java.util.Arrays;
+
 /**
  * This class provides all code necessary to take a query box and produce
  * a query result. The getMapRaster method must return a Map containing all
@@ -8,9 +11,21 @@ import java.util.Map;
  * not draw the output correctly.
  */
 public class Rasterer {
+    private static final int MAX_FILE_DEPTH = 7;
+
+    private static final double[] DEPTH_LON_DPP;
+    static {
+        DEPTH_LON_DPP = new double[MAX_FILE_DEPTH + 1];
+
+        DEPTH_LON_DPP[0] = (MapServer.ROOT_LRLON - MapServer.ROOT_ULLON) / MapServer.TILE_SIZE;
+
+        for (int i = 1; i <= MAX_FILE_DEPTH; i++) {
+            DEPTH_LON_DPP[i] = DEPTH_LON_DPP[i - 1] / 2;
+        }
+    }
 
     public Rasterer() {
-        // YOUR CODE HERE
+        // TODO: do I need to initialize anything here???
     }
 
     /**
@@ -42,11 +57,97 @@ public class Rasterer {
      *                    forget to set this to true on success! <br>
      */
     public Map<String, Object> getMapRaster(Map<String, Double> params) {
-        // System.out.println(params);
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented getMapRaster, nothing is displayed in "
-                           + "your browser.");
+
+        double ullon = params.get("ullon");
+        double ullat = params.get("ullat");
+        double lrlon = params.get("lrlon");
+        double lrlat = params.get("lrlat");
+        double width = params.get("w");
+
+        if (!queryBoxIsValid(ullon, ullat, lrlon, lrlat)) {
+            results.put("query_success", false);
+            return results;
+        }
+
+        // Longitudinal distance per pixel
+        double londpp = (lrlon - ullon) / width;
+
+        int depth = getDepth(londpp);
+        int numTiles = (int) Math.pow(2, depth);
+
+        // Distance per tile
+        double londpt = (MapServer.ROOT_LRLON - MapServer.ROOT_ULLON) / numTiles;
+        double latdpt = (MapServer.ROOT_ULLAT - MapServer.ROOT_LRLAT) / numTiles;
+
+        int xStart = (int) ((ullon - MapServer.ROOT_ULLON) / londpt);
+        if (xStart < 0) {
+            xStart = 0;
+        }
+
+        int xEnd = (int) ((lrlon - MapServer.ROOT_ULLON) / londpt);
+        if (xEnd >= numTiles) {
+            xEnd = numTiles - 1;
+        }
+
+        int yStart = (int) ((MapServer.ROOT_ULLAT - ullat) / latdpt);
+        if (yStart < 0) {
+            yStart = 0;
+        }
+
+        int yEnd = (int) ((MapServer.ROOT_ULLAT - lrlat) / latdpt);
+        if (yEnd >= numTiles) {
+            yEnd = numTiles - 1;
+        }
+
+        int cols = xEnd - xStart + 1;
+        int rows = yEnd - yStart + 1;
+
+        String[][] render_grid = new String[rows][cols];
+
+        for (int row = 0, y = yStart; row < rows; ++row, ++y) {
+            for (int col = 0, x = xStart; col < cols; ++col, ++x) {
+                render_grid[row][col] = getFileName(depth, x, y);
+            }
+        }
+
+        double raster_ul_lon = MapServer.ROOT_ULLON + (xStart * londpt);
+        double raster_ul_lat = MapServer.ROOT_ULLAT - (yStart * latdpt);
+        double raster_lr_lon = MapServer.ROOT_ULLON + ((xEnd + 1) * londpt);
+        double raster_lr_lat = MapServer.ROOT_ULLAT - ((yEnd + 1) * latdpt);
+
+        results.put("render_grid", render_grid);
+        results.put("raster_ul_lon", raster_ul_lon);
+        results.put("raster_ul_lat", raster_ul_lat);
+        results.put("raster_lr_lon", raster_lr_lon);
+        results.put("raster_lr_lat", raster_lr_lat);
+        results.put("depth", depth);
+        results.put("query_success", true);
+
+        //System.out.println(results);
+        //System.out.println(Arrays.deepToString(render_grid));
         return results;
     }
 
+    private boolean queryBoxIsValid(double ullon, double ullat, double lrlon, double lrlat) {
+        return (ullon < MapServer.ROOT_LRLON &&
+                ullat > MapServer.ROOT_LRLAT &&
+                lrlon > MapServer.ROOT_ULLON &&
+                lrlat < MapServer.ROOT_ULLAT &&
+                ullon < lrlon && lrlat < ullat);
+    }
+
+    private int getDepth(double queryLonDpp) {
+        for (int depth = 0; depth <= MAX_FILE_DEPTH; ++depth) {
+            if (DEPTH_LON_DPP[depth] <= queryLonDpp) {
+               return depth;
+            }
+        }
+
+        return MAX_FILE_DEPTH;
+    }
+
+    private String getFileName(int depth, int x, int y) {
+        return String.format("d%d_x%d_y%d.png", depth, x, y);
+    }
 }
