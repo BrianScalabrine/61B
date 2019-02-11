@@ -95,6 +95,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             String v = attributes.getValue("v");
             if (k.equals("maxspeed")) {
                 /* TODO set the max speed of the "current way" here. */
+                lastEdgeName = v;
             } else if (k.equals("highway")) {
                 allowedHighway = ALLOWED_HIGHWAY_TYPES.contains(v);
             } else if (k.equals("name")) {

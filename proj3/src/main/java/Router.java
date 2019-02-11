@@ -59,6 +59,7 @@ public class Router {
 
         Queue<SearchNode> fringe = new PriorityQueue<>(
             Comparator.comparingDouble(SearchNode::priority));
+
         fringe.add(new SearchNode(s, g.distance(s, t)));
 
         while (!fringe.isEmpty()) {
