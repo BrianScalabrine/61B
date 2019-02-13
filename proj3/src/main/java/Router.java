@@ -1,3 +1,4 @@
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -53,17 +54,13 @@ public class Router {
         long t = g.closest(destlon, destlat);
 
         LinkedList<Long> shortestPath = new LinkedList<>();
-
+        Set<Long> marked = new HashSet<>();
         Map<Long, SearchNode> edgeTo = new HashMap<>();
-
         Map<Long, Double> best = new HashMap<>();
         best.put(s, 0.0);
 
-        Set<Long> marked = new HashSet<>();
-
         Queue<SearchNode> fringe = new PriorityQueue<>(
             Comparator.comparingDouble(SearchNode::priority));
-
         fringe.add(new SearchNode(s, g.distance(s, t)));
 
         while (!fringe.isEmpty()) {
@@ -122,37 +119,89 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
+        if (route.size() < 2) {
+            throw new InvalidParameterException("Not enough elements passed in for route");
+        }
+
         List<NavigationDirection> routeDirections = new ArrayList<>();
-        routeDirections.add(new NavigationDirection());
 
         Iterator<Long> iterator = route.iterator();
         long previous = iterator.next();
+        long current = iterator.next();
+
+        NavigationDirection nd = new NavigationDirection();
+        nd.direction = NavigationDirection.START;
+        nd.way = getWayName(g, previous, current);
+        nd.distance = g.distance(previous, current);
 
         while (iterator.hasNext()) {
-            long current = iterator.next();
-            double bearing = g.bearing(previous, current);
+            long next = iterator.next();
 
-            NavigationDirection nd = new NavigationDirection();
+            String way = getWayName(g, current, next);
+            if (!way.equals(nd.way)) {
+                // Way change, add old direction to route directions
+                routeDirections.add(nd);
 
-            if (-15 <= bearing && bearing <= 15) {
-                nd.direction = NavigationDirection.STRAIGHT;
-            } else if (-30 <= bearing && bearing <= 30) {
-                nd.direction = (bearing < 0)
-                    ? NavigationDirection.SLIGHT_LEFT : NavigationDirection.SLIGHT_RIGHT;
-            } else if (-100 <= bearing && bearing <= 100) {
-                nd.direction = (bearing < 0)
-                    ? NavigationDirection.LEFT : NavigationDirection.RIGHT;
-            } else {
-                nd.direction = (bearing < 0)
-                    ? NavigationDirection.SHARP_LEFT : NavigationDirection.SHARP_RIGHT;
+                // Calculate relative bearing
+                double heading = g.bearing(previous, current);
+                double bearing = g.bearing(current, next);
+                double relativeBearing = getRelativeBearing(heading, bearing);
+
+                // Create new direction with new way
+                nd = new NavigationDirection();
+                nd.direction = getDirection(relativeBearing);
+                nd.way = way;
+                nd.distance = 0;
             }
 
+            // Accumulate distance from previous to current
+            nd.distance += g.distance(current, next);
+
             previous = current;
+            current = next;
         }
+
+        // Add final direction
+        routeDirections.add(nd);
 
         return routeDirections;
     }
 
+    private static String getWayName(GraphDB g, long from, long to) {
+        GraphDB.Edge way = g.getEdge(from, to);
+        if (way != null && !way.name.isEmpty()) {
+            return way.name;
+        }
+        //return NavigationDirection.UNKNOWN_ROAD;
+        return "";
+    }
+
+    private static double getRelativeBearing(double heading, double bearing) {
+        // Relative + Heading (in True) = True Bearing
+        // Relative = True Bearing - Heading
+
+        double relativeBearing = (bearing - heading) % 360;
+        if (relativeBearing < -180.0) {
+            relativeBearing += 360.0;
+        }
+        if (relativeBearing >= 180.0) {
+            relativeBearing -= 360.0;
+        }
+
+        return relativeBearing;
+    }
+
+    private static int getDirection(double bearing) {
+        if (-15 < bearing && bearing < 15) {
+            return NavigationDirection.STRAIGHT;
+        } else if (-30 < bearing && bearing < 30) {
+            return (bearing < 0) ? NavigationDirection.SLIGHT_LEFT : NavigationDirection.SLIGHT_RIGHT;
+        } else if (-100 < bearing && bearing < 100) {
+            return (bearing < 0) ? NavigationDirection.LEFT : NavigationDirection.RIGHT;
+        } else {
+            return (bearing < 0) ? NavigationDirection.SHARP_LEFT : NavigationDirection.SHARP_RIGHT;
+        }
+    }
 
     /**
      * Class to represent a navigation direction, which consists of 3 attributes:

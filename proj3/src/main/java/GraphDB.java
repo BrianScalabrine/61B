@@ -8,7 +8,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import java.util.Set;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -29,43 +28,42 @@ public class GraphDB {
         double lat;
         double lon;
         String name;
-        private Set<Long> edges;
+        private Map<Long, Edge> edges;
 
         Node() {
             this.v = 0;
             this.lat = 0;
             this.lon = 0;
             this.name = "";
-            this.edges = new HashSet<>();
+            this.edges = new HashMap<>();
         }
 
-        void addEdge(long w) {
-            edges.add(w);
+        void addEdge(long v, Edge e) {
+            edges.put(v, e);
         }
-        void removeEdge(long w) {
-            edges.remove(w);
+        Edge removeEdge(long v) {
+            return edges.remove(v);
+        }
+        Edge getEdge(long v) {
+            return edges.get(v);
         }
         boolean hasEdges() {
             return !edges.isEmpty();
         }
-        Set<Long> getEdges() {
-            return edges;
+        Set<Long> getNeighbors() {
+            return edges.keySet();
         }
     }
 
-//    static class Edge {
-//        long to;
-//        String name;
-//
-//        Edge(long to) {
-//            this.to = to;
-//            this.name = "";
-//        }
-//
-////        public int hashCode() {
-////            return Long.hashCode(to);
-////        }
-//    }
+    static class Edge {
+        String name;
+        String maxSpeed;
+
+        Edge() {
+            this.name = "";
+            this.maxSpeed = "";
+        }
+    }
 
     private final Map<Long, Node> graph = new HashMap<>();
 
@@ -123,7 +121,7 @@ public class GraphDB {
      */
     Iterable<Long> adjacent(long v) {
         Node node = graph.get(v);
-        return node != null ? node.getEdges() : null;
+        return node != null ? node.getNeighbors() : null;
     }
 
     /**
@@ -185,7 +183,7 @@ public class GraphDB {
      */
     long closest(double lon, double lat) {
         long closest = 0;
-        double closestDistance = Integer.MAX_VALUE;
+        double closestDistance = Double.MAX_VALUE;
 
         for (Node node : graph.values()) {
             double distance = distance(lon, lat, node.lon, node.lat);
@@ -224,21 +222,23 @@ public class GraphDB {
         }
     }
 
-    void addEdge(long from, long to) {
-        Node fromNode = graph.get(from);
-        Node toNode = graph.get(to);
+    void addEdge(long from, long to, Edge edge) {
+        if (edge != null) {
+            Node fromNode = graph.get(from);
+            Node toNode = graph.get(to);
 
-        if (fromNode != null && toNode != null) {
-            fromNode.addEdge(to);
-            toNode.addEdge(from);
+            if (fromNode != null && toNode != null) {
+                fromNode.addEdge(to, edge);
+                toNode.addEdge(from, edge);
+            }
         }
     }
 
     Node removeNode(long v) {
         Node node = graph.remove(v);
         if (node != null) {
-            for (long connected : node.getEdges()) {
-                Node connectedNode = graph.get(connected);
+            for (long w : node.getNeighbors()) {
+                Node connectedNode = graph.get(w);
                 if (connectedNode != null) {
                     connectedNode.removeEdge(v);
                 }
@@ -246,5 +246,10 @@ public class GraphDB {
         }
 
         return node;
+    }
+
+    Edge getEdge(long from, long to) {
+        Node node = graph.get(from);
+        return node != null ? node.getEdge(to) : null;
     }
 }

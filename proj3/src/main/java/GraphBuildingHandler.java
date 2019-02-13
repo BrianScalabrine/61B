@@ -38,11 +38,11 @@ public class GraphBuildingHandler extends DefaultHandler {
             ("motorway", "trunk", "primary", "secondary", "tertiary", "unclassified",
                     "residential", "living_street", "motorway_link", "trunk_link", "primary_link",
                     "secondary_link", "tertiary_link"));
-    private String activeState = "";
+    private String activeState;
     private final GraphDB g;
     private boolean allowedHighway;
     private GraphDB.Node lastNode;
-    private String lastEdgeName;
+    private GraphDB.Edge lastEdge;
     private List<Long> possibleConnections;
 
     /**
@@ -50,9 +50,11 @@ public class GraphBuildingHandler extends DefaultHandler {
      * @param g The graph to populate with the XML data.
      */
     public GraphBuildingHandler(GraphDB g) {
+        this.activeState = "";
         this.g = g;
         this.allowedHighway = false;
         this.lastNode = null;
+        this.lastEdge = null;
         this.possibleConnections = new ArrayList<>();
     }
 
@@ -74,37 +76,33 @@ public class GraphBuildingHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
         if (qName.equals("node")) {
-            /* We encountered a new <node...> tag. */
             activeState = "node";
-
             lastNode = new GraphDB.Node();
             lastNode.v = Long.parseLong(attributes.getValue("id"));
             lastNode.lat = Double.parseDouble(attributes.getValue("lat"));
             lastNode.lon = Double.parseDouble(attributes.getValue("lon"));
         } else if (qName.equals("way")) {
-            /* We encountered a new <way...> tag. */
             activeState = "way";
+            lastEdge = new GraphDB.Edge();
         } else if (activeState.equals("way") && qName.equals("nd")) {
-            /* While looking at a way, we found a <nd...> tag. */
-            long id = Long.parseLong(attributes.getValue("ref"));
-            possibleConnections.add(id);
-            /* Hint1: It would be useful to remember what was the last node in this way. */
+            possibleConnections.add(Long.parseLong(attributes.getValue("ref")));
         } else if (activeState.equals("way") && qName.equals("tag")) {
-            /* While looking at a way, we found a <tag...> tag. */
             String k = attributes.getValue("k");
             String v = attributes.getValue("v");
             if (k.equals("maxspeed")) {
-                /* TODO set the max speed of the "current way" here. */
-                lastEdgeName = v;
+                if (lastEdge != null) {
+                    lastEdge.maxSpeed = v;
+                }
             } else if (k.equals("highway")) {
                 allowedHighway = ALLOWED_HIGHWAY_TYPES.contains(v);
             } else if (k.equals("name")) {
-                lastEdgeName = v;
+                if (lastEdge != null) {
+                    lastEdge.name = v;
+                }
             }
-        } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
-                .equals("name")) {
-            /* While looking at a node, we found a <tag...> with k="name". */
-            /* TODO Create a location. */
+        } else if (activeState.equals("node")
+                && qName.equals("tag")
+                && attributes.getValue("k").equals("name")) {
             if (lastNode != null) {
                 lastNode.name = attributes.getValue("v");
             }
@@ -125,14 +123,14 @@ public class GraphBuildingHandler extends DefaultHandler {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (qName.equals("way")) {
-            if (allowedHighway) {
+            if (allowedHighway && lastEdge != null) {
                 for (int i = 1; i < possibleConnections.size(); ++i) {
                     long from = possibleConnections.get(i);
                     long to = possibleConnections.get(i - 1);
-                    g.addEdge(from, to);
+                    g.addEdge(from, to, lastEdge);
                 }
+                lastEdge = null;
             }
-
             allowedHighway = false;
             possibleConnections.clear();
         } else if (qName.equals("node")) {
