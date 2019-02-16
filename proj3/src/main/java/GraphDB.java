@@ -308,8 +308,9 @@ public class GraphDB {
     }
 
     List<String> getLocationsByPrefix(String prefix) {
-        return trie.get(cleanString(prefix)).stream()
+        return trie.get(cleanString(prefix)).stream().distinct()
                 .map(name -> fullNames.get(name))
                 .collect(Collectors.toList());
     }
 }
+
