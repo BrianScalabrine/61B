@@ -78,7 +78,7 @@ public class GraphBuildingHandler extends DefaultHandler {
         if (qName.equals("node")) {
             activeState = "node";
             lastNode = new GraphDB.Node();
-            lastNode.v = Long.parseLong(attributes.getValue("id"));
+            lastNode.id = Long.parseLong(attributes.getValue("id"));
             lastNode.lat = Double.parseDouble(attributes.getValue("lat"));
             lastNode.lon = Double.parseDouble(attributes.getValue("lon"));
         } else if (qName.equals("way")) {

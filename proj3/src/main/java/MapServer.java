@@ -308,7 +308,7 @@ public class MapServer {
             params.put("lat", node.lat);
             params.put("lon", node.lon);
             params.put("name", node.name);
-            params.put("id", node.v);
+            params.put("id", node.id);
 
             locations.add(params);
         }

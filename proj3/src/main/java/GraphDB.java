@@ -28,14 +28,14 @@ public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
     static class Node {
-        long v;
+        long id;
         double lat;
         double lon;
         String name;
         private Map<Long, Edge> edges;
 
         Node() {
-            this.v = 0;
+            this.id = 0;
             this.lat = 0;
             this.lon = 0;
             this.name = "";
@@ -60,13 +60,13 @@ public class GraphDB {
 
         @Override
         public int hashCode() {
-            return Long.hashCode(v);
+            return Long.hashCode(id);
         }
 
         @Override
         public boolean equals(Object o) {
             if (o instanceof Node) {
-                return v == ((Node) o).v;
+                return id == ((Node) o).id;
             }
             return false;
         }
@@ -208,7 +208,7 @@ public class GraphDB {
         for (Node node : graph.values()) {
             double distance = distance(lon, lat, node.lon, node.lat);
             if (distance < closestDistance) {
-                closest = node.v;
+                closest = node.id;
                 closestDistance = distance;
             }
         }
@@ -238,7 +238,7 @@ public class GraphDB {
 
     void addNode(Node node) {
         if (node != null) {
-            graph.put(node.v, node);
+            graph.put(node.id, node);
 
             String cleanName = cleanString(node.name);
             trie.put(cleanName);
