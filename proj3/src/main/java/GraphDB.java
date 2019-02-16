@@ -7,9 +7,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -53,6 +52,11 @@ public class GraphDB {
         Set<Long> getNeighbors() {
             return edges.keySet();
         }
+
+        @Override
+        public int hashCode() {
+            return Long.hashCode(v);
+        }
     }
 
     static class Edge {
@@ -66,6 +70,9 @@ public class GraphDB {
     }
 
     private final Map<Long, Node> graph = new HashMap<>();
+    private final Map<String, String> fullNames = new HashMap<>();
+    private final Map<String, Set<Node>> locations = new HashMap<>();
+    private final Trie trie = new Trie();
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -219,6 +226,12 @@ public class GraphDB {
     void addNode(Node node) {
         if (node != null) {
             graph.put(node.v, node);
+
+            String cleanName = cleanString(node.name);
+            trie.put(cleanName);
+            fullNames.put(cleanName, node.name);
+
+            locations.computeIfAbsent(node.name, k -> new HashSet<>()).add(node);
         }
     }
 
@@ -236,14 +249,30 @@ public class GraphDB {
 
     Node removeNode(long v) {
         Node node = graph.remove(v);
-        if (node != null) {
-            for (long w : node.getNeighbors()) {
-                Node connectedNode = graph.get(w);
-                if (connectedNode != null) {
-                    connectedNode.removeEdge(v);
-                }
+        if (node == null) {
+            return null;
+        }
+
+        // Remove all edges connecting to this node
+        for (long w : node.getNeighbors()) {
+            Node connectedNode = graph.get(w);
+            if (connectedNode != null) {
+                connectedNode.removeEdge(v);
             }
         }
+
+        // Remove node from appearing in autocomplete searches
+        String cleanName = cleanString(node.name);
+        trie.remove(cleanName);
+        fullNames.remove(cleanName);
+
+        // Remove node from being found in location searches
+        locations.computeIfPresent(node.name, (location, nodes) -> {
+            if (nodes.remove(node) && nodes.isEmpty()) {
+                return null;
+            }
+            return nodes;
+        });
 
         return node;
     }
@@ -251,5 +280,15 @@ public class GraphDB {
     Edge getEdge(long from, long to) {
         Node node = graph.get(from);
         return node != null ? node.getEdge(to) : null;
+    }
+
+    Iterable<Node> getLocations(String name) {
+        return locations.getOrDefault(name, new HashSet<>());
+    }
+
+    Iterable<String> getLocationsByPrefix(String prefix) {
+        return trie.get(cleanString(prefix)).stream()
+                .map(name -> fullNames.get(name))
+                .collect(Collectors.toList());
     }
 }
