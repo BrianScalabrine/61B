@@ -7,7 +7,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +61,14 @@ public class GraphDB {
         @Override
         public int hashCode() {
             return Long.hashCode(v);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Node) {
+                return v == ((Node) o).v;
+            }
+            return false;
         }
     }
 
@@ -286,7 +299,7 @@ public class GraphDB {
         return locations.getOrDefault(name, new HashSet<>());
     }
 
-    Iterable<String> getLocationsByPrefix(String prefix) {
+    List<String> getLocationsByPrefix(String prefix) {
         return trie.get(cleanString(prefix)).stream()
                 .map(name -> fullNames.get(name))
                 .collect(Collectors.toList());

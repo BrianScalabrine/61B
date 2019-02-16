@@ -285,13 +285,7 @@ public class MapServer {
      * cleaned <code>prefix</code>.
      */
     public static List<String> getLocationsByPrefix(String prefix) {
-        List<String> locations = new LinkedList<>();
-
-        for (String location : graph.getLocationsByPrefix(prefix)) {
-            locations.add(location);
-        }
-
-        return locations;
+        return graph.getLocationsByPrefix(prefix);
     }
 
     /**

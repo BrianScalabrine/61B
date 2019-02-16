@@ -195,11 +195,14 @@ public class Router {
         if (-15 < bearing && bearing < 15) {
             return NavigationDirection.STRAIGHT;
         } else if (-30 < bearing && bearing < 30) {
-            return (bearing < 0) ? NavigationDirection.SLIGHT_LEFT : NavigationDirection.SLIGHT_RIGHT;
+            return (bearing < 0)
+                ? NavigationDirection.SLIGHT_LEFT : NavigationDirection.SLIGHT_RIGHT;
         } else if (-100 < bearing && bearing < 100) {
-            return (bearing < 0) ? NavigationDirection.LEFT : NavigationDirection.RIGHT;
+            return (bearing < 0)
+                ? NavigationDirection.LEFT : NavigationDirection.RIGHT;
         } else {
-            return (bearing < 0) ? NavigationDirection.SHARP_LEFT : NavigationDirection.SHARP_RIGHT;
+            return (bearing < 0)
+                ? NavigationDirection.SHARP_LEFT : NavigationDirection.SHARP_RIGHT;
         }
     }
 
