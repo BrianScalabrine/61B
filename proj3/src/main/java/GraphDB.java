@@ -7,11 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import java.util.stream.Collectors;
 
@@ -295,8 +291,20 @@ public class GraphDB {
         return node != null ? node.getEdge(to) : null;
     }
 
-    Set<Node> getLocations(String name) {
-        return locations.getOrDefault(name, new HashSet<>());
+    List<Map<String, Object>> getLocations(String name) {
+        List<Map<String, Object>> locationsMap = new LinkedList<>();
+
+        for (GraphDB.Node node : locations.getOrDefault(name, new HashSet<>())) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("lat", node.lat);
+            params.put("lon", node.lon);
+            params.put("name", node.name);
+            params.put("id", node.id);
+
+            locationsMap.add(params);
+        }
+
+        return locationsMap;
     }
 
     List<String> getLocationsByPrefix(String prefix) {
