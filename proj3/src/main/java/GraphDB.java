@@ -295,7 +295,7 @@ public class GraphDB {
         return node != null ? node.getEdge(to) : null;
     }
 
-    Iterable<Node> getLocations(String name) {
+    Set<Node> getLocations(String name) {
         return locations.getOrDefault(name, new HashSet<>());
     }
 
