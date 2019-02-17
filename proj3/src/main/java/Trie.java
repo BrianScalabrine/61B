@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.TreeMap;
 //import java.util.Stack;
 
 public class Trie {
@@ -14,7 +14,7 @@ public class Trie {
 
         Node() {
             exists = false;
-            children = new HashMap<>();
+            children = new TreeMap<>();
             //children = new Node[R];
         }
     }
@@ -61,7 +61,7 @@ public class Trie {
         return node;
     }
 
-    public boolean remove(String s) {
+    public boolean remove(String word) {
         // TODO
         return false;
     }

@@ -85,7 +85,7 @@ public class GraphDB {
     private final Map<Long, Node> graph = new HashMap<>();
     private final Map<String, String> fullNames = new HashMap<>();
     private final Map<String, Set<Node>> locations = new HashMap<>();
-    private final Trie trie = new Trie();
+    //private final Trie trie = new Trie();
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -241,7 +241,7 @@ public class GraphDB {
             graph.put(node.id, node);
 
             String cleanName = cleanString(node.name);
-            trie.put(cleanName);
+            //trie.put(cleanName);
             fullNames.put(cleanName, node.name);
 
             locations.computeIfAbsent(node.name, k -> new HashSet<>()).add(node);
@@ -276,7 +276,7 @@ public class GraphDB {
 
         // Remove node from appearing in autocomplete searches
         String cleanName = cleanString(node.name);
-        trie.remove(cleanName);
+        //trie.remove(cleanName);
         fullNames.remove(cleanName);
 
         // Remove node from being found in location searches
@@ -312,9 +312,12 @@ public class GraphDB {
     }
 
     List<String> getLocationsByPrefix(String prefix) {
-        return trie.get(cleanString(prefix)).stream().distinct()
-                .map(name -> fullNames.get(name))
-                .collect(Collectors.toList());
+//        return trie.get(cleanString(prefix))
+//                .stream().distinct()
+//                .map(name -> fullNames.get(name))
+//                .collect(Collectors.toList());
+
+        return new LinkedList<>();
     }
 }
 
