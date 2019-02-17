@@ -8,7 +8,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import java.util.List;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -302,11 +302,14 @@ public class GraphDB {
     }
 
     List<Map<String, Object>> getLocations(String locationName) {
-        List<Map<String, Object>> locationsMap = new LinkedList<>();
+        List<Map<String, Object>> locationsMap = new ArrayList<>();
 
-        Set<Node> locationNodes = locations.getOrDefault(locationName, new HashSet<>());
+        Set<Node> locationNodes = locations.get(locationName);
+        if (locationNodes == null) {
+            return locationsMap;
+        }
 
-        locationNodes.forEach(node -> {
+        for (Node node : locationNodes) {
             Map<String, Object> params = new HashMap<>();
             params.put("lat", node.lat);
             params.put("lon", node.lon);
@@ -314,24 +317,20 @@ public class GraphDB {
             params.put("id", node.id);
 
             locationsMap.add(params);
-        });
+        }
 
         return locationsMap;
     }
 
     List<String> getLocationsByPrefix(String prefix) {
-        List<String> fullLocationNames = new LinkedList<>();
+        List<String> fullLocationNames = new ArrayList<>();
 
-        Set<String> cleanNames = prefixes.get(cleanString(prefix));
+        List<String> cleanNames = prefixes.getWords(cleanString(prefix));
         for (String cleanName : cleanNames) {
             fullLocationNames.addAll(locationNames.getOrDefault(cleanName, new HashSet<>()));
         }
 
         return fullLocationNames;
-//        return prefixes.get(cleanString(prefix))
-//                .stream()
-//                .map(name -> fullNames.get(name))
-//                .collect(Collectors.toList());
     }
 }
 

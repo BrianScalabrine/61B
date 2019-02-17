@@ -1,9 +1,9 @@
-//import java.util.List;
-//import java.util.ArrayList;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Set;
-import java.util.TreeSet;
+//import java.util.Set;
+//import java.util.TreeSet;
 //import java.util.Stack;
 
 public class Trie {
@@ -27,9 +27,9 @@ public class Trie {
         root = new Node();
     }
 
-    public void put(String word) {
-        //putRecursive(root, word, 0);
-        putIterative(word);
+    public Node put(String word) {
+        return putIterative(word);
+        //return putRecursive(root, word, 0);
     }
 
     private Node putIterative(String word) {
@@ -68,18 +68,19 @@ public class Trie {
         return false;
     }
 
-    public Set<String> get(String prefix) {
-        Set<String> words = new TreeSet<>();
+    public List<String> getWords(String prefix) {
+        List<String> words = new ArrayList<>();
 
         Node prefixNode = getNode(prefix);
         if (prefixNode != null) {
             collectWordsRecursive(prefixNode, new StringBuilder(prefix), words);
         }
+
         return words;
     }
 
-    private void collectWordsRecursive(Node node, StringBuilder word, Set<String> words) {
-        if (node == null || words == null || word.length() == 0) {
+    private void collectWordsRecursive(Node node, StringBuilder word, List<String> words) {
+        if (node == null || words == null || word == null || word.length() == 0) {
             return;
         }
 
@@ -92,7 +93,6 @@ public class Trie {
             if (word.length() > 0) {
                 word.setLength(word.length() - 1);
             }
-            //collectWordsRecursive(child, new StringBuilder(word).append(c), words);
         });
     }
 
@@ -123,8 +123,8 @@ public class Trie {
 //    }
 
     private Node getNode(String prefix) {
-        //return getNode(root, prefix, 0);
         return getNodeIterative(prefix);
+        //return getNodeRecursive(root, prefix, 0);
     }
 
     private Node getNodeIterative(String prefix) {
@@ -133,12 +133,14 @@ public class Trie {
         }
 
         Node node = root;
+
         for (char c : prefix.toCharArray()) {
             node = node.children.get(c);
             if (node == null) {
                 break;
             }
         }
+
         return node;
     }
 
