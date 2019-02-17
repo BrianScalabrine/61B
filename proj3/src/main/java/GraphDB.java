@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 //import java.util.List;
 //import java.util.LinkedList;
@@ -91,7 +90,7 @@ public class GraphDB {
     }
 
     private final Map<Long, Node> graph = new HashMap<>();
-    private final Map<String, String> fullNames = new HashMap<>();
+    private final Map<String, Set<String>> locationNames = new HashMap<>();
     private final Map<String, Set<Node>> locations = new HashMap<>();
     private final Trie prefixes = new Trie();
 
@@ -250,8 +249,7 @@ public class GraphDB {
 
             String cleanName = cleanString(node.name);
             prefixes.put(cleanName);
-            fullNames.put(cleanName, node.name);
-
+            locationNames.computeIfAbsent(cleanName, k-> new HashSet<>()).add(node.name);
             locations.computeIfAbsent(node.name, k -> new HashSet<>()).add(node);
         }
     }
@@ -285,15 +283,15 @@ public class GraphDB {
         // Remove node from appearing in autocomplete searches
         String cleanName = cleanString(node.name);
         prefixes.remove(cleanName);
-        fullNames.remove(cleanName);
+
+        locationNames.computeIfPresent(cleanName, (name, names) ->
+            names.remove(node.name) && names.isEmpty() ? null : names
+        );
 
         // Remove node from being found in location searches
-        locations.computeIfPresent(node.name, (location, nodes) -> {
-            if (nodes.remove(node) && nodes.isEmpty()) {
-                return null;
-            }
-            return nodes;
-        });
+        locations.computeIfPresent(node.name, (location, nodes) ->
+             nodes.remove(node) && nodes.isEmpty() ? null : nodes
+        );
 
         return node;
     }
@@ -322,10 +320,18 @@ public class GraphDB {
     }
 
     List<String> getLocationsByPrefix(String prefix) {
-        return prefixes.get(cleanString(prefix))
-                .stream()
-                .map(name -> fullNames.get(name))
-                .collect(Collectors.toList());
+        List<String> fullLocationNames = new LinkedList<>();
+
+        Set<String> cleanNames = prefixes.get(cleanString(prefix));
+        for (String cleanName : cleanNames) {
+            fullLocationNames.addAll(locationNames.getOrDefault(cleanName, new HashSet<>()));
+        }
+
+        return fullLocationNames;
+//        return prefixes.get(cleanString(prefix))
+//                .stream()
+//                .map(name -> fullNames.get(name))
+//                .collect(Collectors.toList());
     }
 }
 
