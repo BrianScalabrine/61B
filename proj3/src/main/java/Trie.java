@@ -1,7 +1,9 @@
-import java.util.List;
-import java.util.ArrayList;
+//import java.util.List;
+//import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Set;
+import java.util.TreeSet;
 //import java.util.Stack;
 
 public class Trie {
@@ -66,8 +68,8 @@ public class Trie {
         return false;
     }
 
-    public List<String> get(String prefix) {
-        List<String> words = new ArrayList<>();
+    public Set<String> get(String prefix) {
+        Set<String> words = new TreeSet<>();
 
         Node prefixNode = getNode(prefix);
         if (prefixNode != null) {
@@ -76,7 +78,7 @@ public class Trie {
         return words;
     }
 
-    private void collectWordsRecursive(Node node, StringBuilder word, List<String> words) {
+    private void collectWordsRecursive(Node node, StringBuilder word, Set<String> words) {
         if (node == null || words == null || word.length() == 0) {
             return;
         }
@@ -86,7 +88,11 @@ public class Trie {
         }
 
         node.children.forEach((c, child) -> {
-            collectWordsRecursive(child, new StringBuilder(word).append(c), words);
+            collectWordsRecursive(child, word.append(c), words);
+            if (word.length() > 0) {
+                word.setLength(word.length() - 1);
+            }
+            //collectWordsRecursive(child, new StringBuilder(word).append(c), words);
         });
     }
 

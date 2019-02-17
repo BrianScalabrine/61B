@@ -30,7 +30,9 @@ public class TestRouter {
 
     @Test
     public void testShortestPath() throws Exception {
-        //graph.getLocationsByPrefix("the");
+        List<String> locations = graph.getLocationsByPrefix("the");
+        List<GraphDB.Node> locationNodes = graph.getLocationsByName("Radio Shack");
+
 
 //        List<Map<String, Double>> testParams = paramsFromFile();
 //        List<List<Long>> expectedResults = resultsFromFile();
