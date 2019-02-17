@@ -7,12 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -295,23 +290,11 @@ public class GraphDB {
         return node != null ? node.getEdge(to) : null;
     }
 
-    List<Map<String, Object>> getLocations(String name) {
-        List<Map<String, Object>> locationsMap = new LinkedList<>();
-
-        for (GraphDB.Node node : locations.getOrDefault(name, new HashSet<>())) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("lat", node.lat);
-            params.put("lon", node.lon);
-            params.put("name", node.name);
-            params.put("id", node.id);
-
-            locationsMap.add(params);
-        }
-
-        return locationsMap;
+    Iterable<Node> locationsByName(String locationName) {
+        return locations.getOrDefault(locationName, new HashSet<>());
     }
 
-    List<String> getLocationsByPrefix(String prefix) {
+    List<String> locationsByPrefix(String prefix) {
 //        return trie.get(cleanString(prefix))
 //                .stream().distinct()
 //                .map(name -> fullNames.get(name))
