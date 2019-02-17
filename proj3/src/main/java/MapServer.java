@@ -301,19 +301,21 @@ public class MapServer {
      * "id" : Number, The id of the node. <br>
      */
     public static List<Map<String, Object>> getLocations(String locationName) {
-        List<Map<String, Object>> locationsMap = new LinkedList<>();
+//        List<Map<String, Object>> locationsMap = new LinkedList<>();
+//
+//        for (GraphDB.Node node : graph.getLocations(locationName)) {
+//            Map<String, Object> params = new HashMap<>();
+//            params.put("lat", node.lat);
+//            params.put("lon", node.lon);
+//            params.put("name", node.name);
+//            params.put("id", node.id);
+//
+//            locationsMap.add(params);
+//        }
+//
+//        return locationsMap;
 
-        for (GraphDB.Node node : graph.getLocationsByName(locationName)) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("lat", node.lat);
-            params.put("lon", node.lon);
-            params.put("name", node.name);
-            params.put("id", node.id);
-
-            locationsMap.add(params);
-        }
-
-        return locationsMap;
+        return graph.getLocations(locationName);
     }
 
     /**

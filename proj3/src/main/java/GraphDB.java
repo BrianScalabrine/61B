@@ -303,9 +303,22 @@ public class GraphDB {
         return node != null ? node.getEdge(to) : null;
     }
 
-    List<Node> getLocationsByName(String locationName) {
-        return new LinkedList<>(
-            locations.getOrDefault(locationName, new HashSet<>()));
+    List<Map<String, Object>> getLocations(String locationName) {
+        List<Map<String, Object>> locationsMap = new LinkedList<>();
+
+        Set<Node> locationNodes = locations.getOrDefault(locationName, new HashSet<>());
+
+        locationNodes.forEach(node -> {
+            Map<String, Object> params = new HashMap<>();
+            params.put("lat", node.lat);
+            params.put("lon", node.lon);
+            params.put("name", node.name);
+            params.put("id", node.id);
+
+            locationsMap.add(params);
+        });
+
+        return locationsMap;
     }
 
     List<String> getLocationsByPrefix(String prefix) {
