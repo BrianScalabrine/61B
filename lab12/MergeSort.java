@@ -72,29 +72,25 @@ public class MergeSort {
     /** Returns a Queue that contains the given items sorted from least to greatest. */
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
-        return recursiveMergeSort(items);
+        // Queue is already sorted
+        if (items.size() < 2) {
+            return items;
+        }
 
-//        // Queue is already sorted
-//        if (items.size() < 2) {
-//            return items;
-//        }
-//
-//        Queue<Queue<Item>> queues = makeSingleItemQueues(items);
-//
-//        while (queues.size() > 1) {
-//            Queue<Item> q1 = queues.dequeue();
-//            Queue<Item> q2 = queues.dequeue();
-//            queues.enqueue(mergeSortedQueues(q1, q2));
-//        }
-//
-//        return queues.dequeue();
+        Queue<Queue<Item>> queues = makeSingleItemQueues(items);
+
+        while (queues.size() > 1) {
+            Queue<Item> q1 = queues.dequeue();
+            Queue<Item> q2 = queues.dequeue();
+            queues.enqueue(mergeSortedQueues(q1, q2));
+        }
+
+        return queues.dequeue();
     }
 
-    private static <Item extends Comparable> Queue<Item> recursiveMergeSort(
+    private static <Item extends Comparable> Queue<Item> mergeSortRecursive(
             Queue<Item> items) {
-
         int numItems = items.size();
-
         if (numItems < 2) {
             return items;
         }
@@ -109,7 +105,7 @@ public class MergeSort {
             q2.enqueue(items.dequeue());
         }
 
-        return mergeSortedQueues(recursiveMergeSort(q1), recursiveMergeSort(q2));
+        return mergeSortedQueues(mergeSortRecursive(q1), mergeSortRecursive(q2));
     }
 
     public static void main(String[] args) {
