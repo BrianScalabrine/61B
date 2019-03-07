@@ -49,10 +49,10 @@ public class QuickSort {
             Queue<Item> less, Queue<Item> equal, Queue<Item> greater) {
         for (Item item : unsorted) {
             int compare = item.compareTo(pivot);
-            if (compare == 0) {
-                equal.enqueue(item);
-            } else if (compare < 0) {
+            if (compare < 0) {
                 less.enqueue(item);
+            } else if (compare == 0) {
+                equal.enqueue(item);
             } else {
                 greater.enqueue(item);
             }
@@ -73,10 +73,10 @@ public class QuickSort {
         Item pivot = getRandomItem(items);
         partition(items, pivot, less, equal, greater);
 
-        Queue<Item> left = quickSort(less);
-        Queue<Item> right = quickSort(greater);
+        less = quickSort(less);
+        greater = quickSort(greater);
 
-        return catenate(catenate(left, equal), right);
+        return catenate(catenate(less, equal), greater);
     }
 
     public static void main(String[] args) {
