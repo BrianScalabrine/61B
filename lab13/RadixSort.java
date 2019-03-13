@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Class for doing Radix sort
  *
@@ -5,6 +8,7 @@
  *
  */
 public class RadixSort {
+    private static final int R = 256;
     /**
      * Does LSD radix sort on the passed in array with the following restrictions:
      * The array can only have ASCII Strings (sequence of 1 byte characters)
@@ -16,8 +20,20 @@ public class RadixSort {
      * @return String[] the sorted array
      */
     public static String[] sort(String[] asciis) {
-        // TODO: Implement LSD Sort
-        return null;
+        int maxLength = Integer.MIN_VALUE;
+        for (String s : asciis) {
+            int length = s.length();
+            if (length > maxLength) {
+                maxLength = length;
+            }
+        }
+
+        String[] sorted = asciis.clone();
+        for (int i = maxLength - 1; i >= 0; i--) {
+            sortHelperLSD(sorted, i);
+        }
+
+        return sorted;
     }
 
     /**
@@ -27,8 +43,22 @@ public class RadixSort {
      * @param index The position to sort the Strings on.
      */
     private static void sortHelperLSD(String[] asciis, int index) {
-        // Optional LSD helper method for required LSD radix sort
-        return;
+        Queue<String>[] buckets = new Queue[R];
+        for (int i = 0; i < buckets.length; i++) {
+            buckets[i] = new LinkedList<>();
+        }
+
+        for (String s : asciis) {
+            int bucketIndex = index >= s.length() ? 0 : (int) s.charAt(index);
+            buckets[bucketIndex].add(s);
+        }
+
+        int i = 0;
+        for (Queue<String> bucket : buckets) {
+            while (!bucket.isEmpty()) {
+                asciis[i++] = bucket.poll();
+            }
+        }
     }
 
     /**
@@ -44,5 +74,10 @@ public class RadixSort {
     private static void sortHelperMSD(String[] asciis, int start, int end, int index) {
         // Optional MSD helper method for optional MSD radix sort
         return;
+    }
+
+    public static void main(String[] args) {
+        String[] asciis = { "SubmissionPublisher", "Brother", "Chicken", "dude", "chicken", "Gigantic", "Gargantuan" };
+        sort(asciis);
     }
 }
