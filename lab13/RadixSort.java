@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -43,22 +44,35 @@ public class RadixSort {
      * @param index The position to sort the Strings on.
      */
     private static void sortHelperLSD(String[] asciis, int index) {
-        Queue<String>[] buckets = new Queue[R + 1];
-        for (int i = 0; i < buckets.length; i++) {
-            buckets[i] = new LinkedList<>();
-        }
+        int[] counts = new int[R + 1];
 
+        // Get counts for each string that has character at the current index
         for (String s : asciis) {
-            int bucketIndex = index >= s.length() ? 0 : (int) s.charAt(index);
-            buckets[bucketIndex + 1].add(s);
+            int asciiIndex = getAsciiIndex(s, index);
+            counts[asciiIndex + 1]++;
         }
 
-        int i = 0;
-        for (Queue<String> bucket : buckets) {
-            while (!bucket.isEmpty()) {
-                asciis[i++] = bucket.poll();
-            }
+        // Calculate start position for each string using their counts for the character at the current index
+        int pos = 0;
+        int[] starts = new int[counts.length];
+        for (int i = 0; i < starts.length; i++) {
+            starts[i] = pos;
+            pos += counts[i];
         }
+
+        // Clone the asciis string array and overwrite it in the correct order for the current character
+        String[] asciisClone = asciis.clone();
+        for (int i = 0; i < asciis.length; i++) {
+            String s = asciisClone[i];
+            int asciiIndex = getAsciiIndex(s, index);
+            int place = starts[asciiIndex + 1];
+            asciis[place] = s;
+            starts[asciiIndex + 1]++;
+        }
+    }
+
+    private static int getAsciiIndex(String s, int index) {
+        return index >= s.length() ? 0 : (int) s.charAt(index);
     }
 
     /**
@@ -78,6 +92,11 @@ public class RadixSort {
 
     public static void main(String[] args) {
         String[] asciis = { "SubmissionPublisher", "Brother", "Chicken", "dude", "chicken", "Gigantic", "Gargantuan" };
-        sort(asciis);
+        String[] sorted = sort(asciis);
+
+        Arrays.sort(asciis);
+        System.out.println(Arrays.toString(sorted));
+        System.out.println(Arrays.toString(asciis));
+
     }
 }
