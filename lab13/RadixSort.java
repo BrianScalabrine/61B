@@ -44,12 +44,11 @@ public class RadixSort {
      * @param index The position to sort the Strings on.
      */
     private static void sortHelperLSD(String[] asciis, int index) {
-        int[] counts = new int[R + 1];
-
         // Get counts for each string that has character at the current index
+        int[] counts = new int[R + 1];
         for (String s : asciis) {
             int asciiIndex = getAsciiIndex(s, index);
-            counts[asciiIndex + 1]++;
+            counts[asciiIndex]++;
         }
 
         // Calculate start position for each string using their counts for the character at the current index
@@ -61,18 +60,15 @@ public class RadixSort {
         }
 
         // Clone the asciis string array and overwrite it in the correct order for the current character
-        String[] asciisClone = asciis.clone();
-        for (int i = 0; i < asciis.length; i++) {
-            String s = asciisClone[i];
+        for (String s : asciis.clone()) {
             int asciiIndex = getAsciiIndex(s, index);
-            int place = starts[asciiIndex + 1];
+            int place = starts[asciiIndex]++;
             asciis[place] = s;
-            starts[asciiIndex + 1]++;
         }
     }
 
     private static int getAsciiIndex(String s, int index) {
-        return index >= s.length() ? 0 : (int) s.charAt(index);
+        return index >= s.length() ? 0 : (int) s.charAt(index) + 1;
     }
 
     /**
